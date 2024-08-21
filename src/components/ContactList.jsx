@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ContactRow from "./ContactRow";
+import { useEffect } from "react";
 
 const dummyContacts = [
   { id: 1, name: "R2-D2", phone: "222-222-2222", email: "r2d2@droids.com" },
@@ -7,24 +8,36 @@ const dummyContacts = [
   { id: 3, name: "BB-8", phone: "888-888-8888", email: "bb8@droids.com" },
 ];
 
-export default function ContactList() {
+export default function ContactList({setSelectedContactId}) {
   const [contacts, setContacts] = useState(dummyContacts);
+  useEffect(() => {
+    async function fetchContacts() {
+        try {
+           const response = await fetch("https://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/users");
+           const result = await response.json();
+           setContacts(result);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    fetchContacts()
+  }, []);
   console.log("Contacts:", contacts);
   return (
     <table>
       <thead>
         <tr>
-          <th colSpan={3}>Contact List</th>
+          <th colSpan={3}>Select a name for more information</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <tr className="headingsForTable">
           <td>Name</td>
           <td>Email</td>
           <td>Phone</td>
         </tr>
         {contacts.map((contact) => {
-          return <ContactRow key={contact.id} contact={contact} />;
+          return <ContactRow setSelectedContactId = {setSelectedContactId} key={contact.id} contact={contact} />;
         })}
       </tbody>
     </table>
